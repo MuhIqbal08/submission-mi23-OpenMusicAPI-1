@@ -1,0 +1,16 @@
+{
+  "env": {
+    "commonjs": true,
+    "es2021": true,
+    "node": true
+  },
+  "extends": "airbnb-base",
+  "parserOptions": {
+    "ecmaVersion": "latest"
+  },
+  "rules": {
+    "no-console": "off",
+    "import/no-extraneous-dependencies": 0,
+    "no-underscore-dangle": ["error", { "allow": ["_service", "_validator", "_pool", "_authenticationsService", "_usersService", "_tokenManager", "_collaborationsService", "_playlistsService", "_songsService", "_songService"] }]
+  }
+}
