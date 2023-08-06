@@ -8,20 +8,8 @@ class PlaylistSongsService {
     this._pool = new Pool();
   }
 
-  async addSongToPlaylist(playlistId, songId) {
+  async addSongToPlaylist({ playlistId, songId }) {
     const id = `playlistsong-${nanoid(16)}`;
-
-    // Check if the songId exists in the songs table
-    const songQuery = {
-      text: 'SELECT id FROM songs WHERE id = $1',
-      values: [songId],
-    };
-
-    const songResult = await this._pool.query(songQuery);
-
-    if (songResult.rows.length === 0) {
-      throw new NotFoundError('Lagu tidak ditemukan');
-    }
 
     const query = {
       text: 'INSERT INTO playlistsongs VALUES ($1, $2, $3) RETURNING id',

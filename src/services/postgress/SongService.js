@@ -104,6 +104,21 @@ class SongServices {
       throw new NotFoundError('Lagu gagal dihapus. Id tidak ditemukan');
     }
   }
+
+  async verifyPlaylistSong(songId) {
+    const query = {
+      text: 'SELECT * FROM songs WHERE id = $1',
+      values: [songId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rows[0].id) {
+      throw new InvariantError('Lagu gagal didaftarkan ke playlist');
+    }
+
+    return result.rows[0].id;
+  }
 }
 
 module.exports = SongServices;

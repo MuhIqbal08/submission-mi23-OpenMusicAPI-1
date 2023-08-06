@@ -2,7 +2,6 @@ const { Pool } = require('pg');
 const { nanoid } = require('nanoid');
 const InvariantError = require('../../exceptions/InvariantError');
 const NotFoundError = require('../../exceptions/NotFoundError');
-const { mapDBToPlaylistsModel } = require('../../utils');
 const AuthorizationError = require('../../exceptions/AuthorizationError');
 
 class PlaylistService {
@@ -11,7 +10,7 @@ class PlaylistService {
     this._collaborationsService = collaborationsService;
   }
 
-  async addPlaylist(name, owner) {
+  async addPlaylist({ name, owner }) {
     const id = `playlist-${nanoid(16)}`;
 
     const query = {
@@ -39,7 +38,7 @@ class PlaylistService {
     };
 
     const result = await this._pool.query(query);
-    return result.rows.map(mapDBToPlaylistsModel);
+    return result.rows;
   }
 
   async deletePlaylistById(playlistId, owner) {
@@ -55,6 +54,19 @@ class PlaylistService {
     }
   }
 
+  async getPlaylistActivities(playlistId) {
+    const query = {
+      text: `SELECT users.username, playlist_song_activities.title, playlist_song_activities.action playlist_song_activities.time 
+         FROM playlist_song_activities
+         JOIN users ON users.id = playlist_song_activities.user_id
+         WHERE playlist_id = $1`,
+      values: [playlistId],
+    };
+
+    const result = await this._pool.query(query);
+    return result.rows;
+  }
+
   async verifyPlaylistOwner(id, owner) {
     const query = {
       text: 'SELECT * FROM playlists WHERE id = $1',
@@ -62,7 +74,7 @@ class PlaylistService {
     };
     const result = await this._pool.query(query);
     if (!result.rows.length) {
-      throw new NotFoundError('Catatan tidak ditemukan');
+      throw new NotFoundError('Playlist tidak ditemukan');
     }
     const playlist = result.rows[0];
     if (playlist.owner !== owner) {
@@ -83,27 +95,6 @@ class PlaylistService {
         throw error;
       }
     }
-  }
-
-  async getPlaylistActivities(playlistId) {
-    const query = {
-      text: 'SELECT username, title, action, time FROM playlist_song_activities WHERE playlist_id = $1',
-      values: [playlistId],
-    };
-
-    const result = await this._pool.query(query);
-    return result.rows;
-  }
-
-  async addPlaylistActivity(playlistId, username, title, action, time) {
-    const id = `activity-${nanoid(16)}`;
-
-    const query = {
-      text: 'INSERT INTO playlist_song_activities VALUES ($1, $2, $3, $4, $5, $6)',
-      values: [id, playlistId, title, username, action, time],
-    };
-
-    await this._pool.query(query);
   }
 }
 

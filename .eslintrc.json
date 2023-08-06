@@ -11,6 +11,6 @@
   "rules": {
     "no-console": "off",
     "import/no-extraneous-dependencies": 0,
-    "no-underscore-dangle": ["error", { "allow": ["_service", "_validator", "_pool", "_authenticationsService", "_usersService", "_tokenManager", "_collaborationsService", "_playlistsService", "_songsService", "_songService"] }]
+    "no-underscore-dangle": ["error", { "allow": ["_service", "_validator", "_pool", "_authenticationsService", "_usersService", "_tokenManager", "_collaborationsService", "_playlistsService", "_songsService", "_playlistsSongService"] }]
   }
 }
