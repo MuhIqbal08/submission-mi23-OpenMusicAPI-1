@@ -56,15 +56,12 @@ class PlaylistService {
 
   async getPlaylistActivities(playlistId) {
     const query = {
-      text: `SELECT users.username, playlist_song_activities.title, playlist_song_activities.action playlist_song_activities.time 
-         FROM playlist_song_activities
-         JOIN users ON users.id = playlist_song_activities.user_id
-         WHERE playlist_id = $1`,
+      text: 'SELECT * FROM playlist_song_activities WHERE id = $1',
       values: [playlistId],
     };
 
     const result = await this._pool.query(query);
-    return result.rows;
+    return result.rows[0];
   }
 
   async verifyPlaylistOwner(id, owner) {

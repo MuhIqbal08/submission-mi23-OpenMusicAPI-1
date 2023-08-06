@@ -12,13 +12,13 @@ class PlaylistsSongHandler {
 
   async postPlaylistSongHandler(request, h) {
     this._validator.validatePlaylistSongPayload(request.payload);
-    const { id } = request.params;
+    const { id: playlistId } = request.params;
     const { songId } = request.payload;
     const { id: credentialId } = request.auth.credentials;
 
-    await this._playlistsService.verifyPlaylistAccess(id, credentialId);
+    await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
     await this._songsService.verifyPlaylistSong(songId);
-    await this._playlistsSongService.addSongToPlaylist(id, songId);
+    await this._playlistsSongService.addSongToPlaylist({ playlistId, songId });
 
     const response = h.response({
       status: 'success',
@@ -39,7 +39,7 @@ class PlaylistsSongHandler {
     const response = {
       status: 'success',
       data: {
-        playlist: playlists.map((playlist) => ({
+        playlists: playlists.map((playlist) => ({
           id: playlist.id,
           name: playlist.name,
           username: playlist.owner,
