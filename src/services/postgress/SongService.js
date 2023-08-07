@@ -113,8 +113,8 @@ class SongServices {
 
     const result = await this._pool.query(query);
 
-    if (!result.rows.length === 0) {
-      throw new InvariantError('Lagu gagal didaftarkan ke playlist');
+    if (result.rows.length === 0) {
+      throw new NotFoundError('Lagu tidak ditemukan');
     }
 
     return result.rows[0];

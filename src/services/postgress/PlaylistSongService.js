@@ -8,7 +8,7 @@ class PlaylistSongsService {
     this._pool = new Pool();
   }
 
-  async addSongToPlaylist({ playlistId, songId }) {
+  async addSongToPlaylist(playlistId, songId) {
     const id = `playlistsong-${nanoid(16)}`;
 
     const query = {
@@ -18,7 +18,7 @@ class PlaylistSongsService {
 
     const result = await this._pool.query(query);
 
-    if (!result.rows[0].id) {
+    if (result.rows.length === 0) {
       throw new InvariantError('Lagu gagal ditambahkan ke playlist');
     }
 
@@ -26,7 +26,7 @@ class PlaylistSongsService {
   }
 
   async getSongsByPlaylistId(playlistId) {
-    const query = {
+    const querySong = {
       text: `SELECT songs.id, songs.title, songs.performer 
            FROM songs 
            JOIN playlistsongs ON songs.id = playlistsongs.song_id 
@@ -34,11 +34,28 @@ class PlaylistSongsService {
       values: [playlistId],
     };
 
-    const result = await this._pool.query(query);
-    return result.rows;
+    const queryPlaylist = {
+      text: `SELECT playlists.id, playlists.name, users.username
+           FROM playlists
+           INNER JOIN users ON playlists.owner = users.id
+           WHERE playlists.id = $1`,
+      values: [playlistId],
+    };
+
+    const resultSongs = await this._pool.query(querySong);
+    const resultPlaylists = await this._pool.query(queryPlaylist);
+
+    if (!resultPlaylists.rows.length) {
+      throw new NotFoundError('Playlist tidak ditemukan');
+    }
+
+    return {
+      playlist: resultPlaylists.rows,
+      songs: resultSongs.rows,
+    };
   }
 
-  async deleteSongFromPlaylist(playlistId, songId) {
+  async deleteSongByPlaylist(playlistId, songId) {
     const query = {
       text: 'DELETE FROM playlistsongs WHERE playlist_id = $1 AND song_id = $2 RETURNING id',
       values: [playlistId, songId],
@@ -47,7 +64,7 @@ class PlaylistSongsService {
     const result = await this._pool.query(query);
 
     if (!result.rows.length) {
-      throw new NotFoundError('Lagu gagal dihapus dari playlist. Id tidak ditemukan atau Anda tidak berhak menghapus lagu ini');
+      throw new InvariantError('Lagu gagal dihapus dari playlist');
     }
   }
 }
