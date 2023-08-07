@@ -29,7 +29,7 @@ class PlaylistSongsService {
     const querySong = {
       text: `SELECT songs.id, songs.title, songs.performer 
            FROM songs 
-           JOIN playlistsongs ON songs.id = playlistsongs.song_id 
+           INNER JOIN playlistsongs ON songs.id = playlistsongs.song_id 
            WHERE playlistsongs.playlist_id = $1`,
       values: [playlistId],
     };
@@ -50,7 +50,9 @@ class PlaylistSongsService {
     }
 
     return {
-      playlist: resultPlaylists.rows,
+      id: resultPlaylists.rows[0].id,
+      name: resultPlaylists.rows[0].name,
+      username: resultPlaylists.rows[0].username,
       songs: resultSongs.rows,
     };
   }

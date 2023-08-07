@@ -35,13 +35,12 @@ class PlaylistsSongHandler {
     await this._playlistsService.verifyPlaylistAccess(id, credentialId);
     const playlists = await this._playlistsSongService.getSongsByPlaylistId(id);
 
-    const response = {
+    return {
       status: 'success',
       data: {
         playlists,
       },
     };
-    return response;
   }
 
   async deletePlaylistSongHandler(request) {
