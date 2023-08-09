@@ -23,11 +23,6 @@ const routes = (handler) => [
       auth: 'openmusicdb_jwt',
     },
   },
-  {
-    method: 'GET',
-    path: '/playlists/{id}/activities',
-    handler: handler.getPlaylistActivitiesHandler,
-  },
 ];
 
 module.exports = routes;

@@ -41,10 +41,10 @@ class PlaylistService {
     return result.rows;
   }
 
-  async deletePlaylistById(playlistId, owner) {
+  async deletePlaylistById(id) {
     const query = {
-      text: 'DELETE FROM playlists WHERE id = $1 AND owner = $2 RETURNING id',
-      values: [playlistId, owner],
+      text: 'DELETE FROM playlists WHERE id = $1 RETURNING id',
+      values: [id],
     };
 
     const result = await this._pool.query(query);
@@ -52,16 +52,6 @@ class PlaylistService {
     if (!result.rows.length) {
       throw new NotFoundError('Playlist gagal dihapus. Id tidak ditemukan atau Anda tidak berhak menghapus playlist ini');
     }
-  }
-
-  async getPlaylistActivities(playlistId) {
-    const query = {
-      text: 'SELECT * FROM playlist_song_activities WHERE id = $1',
-      values: [playlistId],
-    };
-
-    const result = await this._pool.query(query);
-    return result.rows[0];
   }
 
   async verifyPlaylistOwner(id, owner) {

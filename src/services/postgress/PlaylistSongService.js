@@ -57,6 +57,44 @@ class PlaylistSongsService {
     };
   }
 
+  async getPlaylistActivitiesHandler(request) {
+    const { id: playlistId } = request.params;
+    const { id: credentialId } = request.auth.credentials;
+
+    await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
+    const activities = await this._playlistsSongService.getPlaylistActivities(playlistId);
+
+    return {
+      status: 'success',
+      data: {
+        playlistId,
+        activities: activities.map((activity) => ({
+          username: activity.username,
+          title: activity.title,
+          action: activity.action,
+          time: activity.time,
+        })),
+      },
+    };
+  }
+
+  async getPlaylistActivities(playlistId) {
+    const queryActivity = {
+      text: 'SELECT * FROM playlist_song_activities WHERE id = $1',
+      values: [playlistId],
+    };
+
+    const resultActivity = await this._pool.query(queryActivity);
+
+    if (!resultActivity.rows.length) {
+      throw new NotFoundError('Aktivitas playlist tidak ditemukan');
+    }
+
+    return {
+      activities: resultActivity.rows[0].activities,
+    };
+  }
+
   async deleteSongByPlaylist(playlistId, songId) {
     const query = {
       text: 'DELETE FROM playlistsongs WHERE playlist_id = $1 AND song_id = $2 RETURNING id',
@@ -65,7 +103,7 @@ class PlaylistSongsService {
 
     const result = await this._pool.query(query);
 
-    if (!result.rows.length) {
+    if (result.rows.length === 0) {
       throw new InvariantError('Lagu gagal dihapus dari playlist');
     }
   }
