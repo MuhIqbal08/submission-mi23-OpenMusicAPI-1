@@ -57,27 +57,6 @@ class PlaylistSongsService {
     };
   }
 
-  async getPlaylistActivitiesHandler(request) {
-    const { id: playlistId } = request.params;
-    const { id: credentialId } = request.auth.credentials;
-
-    await this._playlistsService.verifyPlaylistAccess(playlistId, credentialId);
-    const activities = await this._playlistsSongService.getPlaylistActivities(playlistId);
-
-    return {
-      status: 'success',
-      data: {
-        playlistId,
-        activities: activities.map((activity) => ({
-          username: activity.username,
-          title: activity.title,
-          action: activity.action,
-          time: activity.time,
-        })),
-      },
-    };
-  }
-
   async getPlaylistActivities(playlistId) {
     const queryActivity = {
       text: 'SELECT * FROM playlist_song_activities WHERE id = $1',
