@@ -1,6 +1,7 @@
 const { Pool } = require('pg');
 const { nanoid } = require('nanoid');
 const InvariantError = require('../../exceptions/InvariantError');
+const NotFoundError = require('../../exceptions/NotFoundError');
 
 class CollaborationsService {
   constructor() {
@@ -17,7 +18,7 @@ class CollaborationsService {
 
     const result = await this._pool.query(query);
 
-    if (!result.rows.length) {
+    if (!result.rows[0].id) {
       throw new InvariantError('Kolaborasi gagal ditambahkan');
     }
 
@@ -26,7 +27,7 @@ class CollaborationsService {
 
   async deleteCollaboration(playlistId, userId) {
     const query = {
-      text: 'DELETE FROM collaborations WHERE playlist_id = $1 AND user_id = $2 RETURNING id',
+      text: 'DELETE FROM collaborations WHERE playlist_id = $1 AND user_id = $2',
       values: [playlistId, userId],
     };
 
@@ -47,6 +48,19 @@ class CollaborationsService {
 
     if (!result.rows.length) {
       throw new InvariantError('Kolaborasi gagal diverifikasi');
+    }
+  }
+
+  async verifyUserCollaboration(userId) {
+    const query = {
+      text: 'SELECT * FROM collaborations WHERE user_id = $1',
+      values: [userId],
+    };
+
+    const result = await this._pool.query(query);
+
+    if (!result.rows.length) {
+      throw new NotFoundError('Kolaborasi UserId tidak ditemukan');
     }
   }
 }

@@ -12,7 +12,7 @@ exports.up = (pgm) => {
       type: 'VARCHAR(50)',
       notNull: true,
     },
-    song_id: {
+   song_i d: {
       type: 'VARCHAR(50)',
       notNull: true,
     },

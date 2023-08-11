@@ -18,7 +18,10 @@ class PlaylistsSongHandler {
 
     await this._playlistsService.verifyPlaylistAccess(id, credentialId);
     await this._songsService.verifyPlaylistSong(songId);
-    await this._playlistsSongService.addSongToPlaylist(id, songId);
+    await this._playlistsSongService.addSongToPlaylist(id, songId, credentialId);
+
+    const action = 'add';
+    await this._playlistsSongService.addActivity(id, songId, credentialId, action);
 
     const response = h.response({
       status: 'success',
@@ -49,7 +52,10 @@ class PlaylistsSongHandler {
     const { id: credentialId } = request.auth.credentials;
 
     await this._playlistsService.verifyPlaylistAccess(id, credentialId);
-    await this._playlistsSongService.deleteSongByPlaylist(id, songId);
+    await this._playlistsSongService.deleteSongByPlaylist(id, songId, credentialId);
+
+    const action = 'delete';
+    await this._playlistsSongService.addActivity(id, songId, credentialId, action);
 
     return {
       status: 'success',
@@ -68,12 +74,7 @@ class PlaylistsSongHandler {
       status: 'success',
       data: {
         playlistId,
-        activities: activities.map((activity) => ({
-          username: activity.username,
-          title: activity.title,
-          action: activity.action,
-          time: activity.time,
-        })),
+        activities,
       },
     };
   }
