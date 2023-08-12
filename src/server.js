@@ -41,11 +41,11 @@ const CollaborationsService = require('./services/postgress/CollaborationService
 const CollaborationsValidator = require('./validator/collaborations');
 
 const init = async () => {
-  const collaborationsService = new CollaborationsService();
   const albumService = new AlbumsService();
   const songsService = new SongServices();
   const usersService = new UsersService();
   const authenticationsService = new AuthenticationsService();
+  const collaborationsService = new CollaborationsService();
   const playlistService = new PlaylistService(collaborationsService);
   const playlistsSongService = new PlaylistSongService();
   const server = Hapi.server({
